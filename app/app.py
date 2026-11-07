@@ -58,9 +58,12 @@ def setup_users():
     db.create_all()
 
     if not User.query.first():
+        initial_password = os.environ.get('INITIAL_ADMIN_PASSWORD')
+        if not initial_password or not 16 <= len(initial_password) <= 80:
+            raise RuntimeError('Set INITIAL_ADMIN_PASSWORD to a unique 16-80 character secret before initialization')
         user = User()
         user.username = 'admin'
-        user.password = 'admin123'
+        user.password = initial_password
         db.session.add(user)
         db.session.commit()
     if not Customer.query.first():
